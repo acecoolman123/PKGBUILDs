@@ -20,7 +20,7 @@ conflicts=('shedskin')
 provides=('shedskin')
 
 pkgver() {
-  cd "${_gitname}"
+  cd "${srcdir}/${_gitname}"
 
   git describe --always | sed 's/-/./g'
 }

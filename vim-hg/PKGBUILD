@@ -13,8 +13,8 @@ pkgver=4183
 pkgrel=2
 url="http://vim.org"
 license=('custom:vim')
-_gitname=vim
-source=("${_gitname}::hg+https://vim.googlecode.com/hg" 'vimrc' 'archlinux.vim'
+_hgname=vim
+source=("${_hgname}::hg+https://vim.googlecode.com/hg" 'vimrc' 'archlinux.vim'
         'gvim.desktop')
 license=('custom:vim')
 md5sums=('SKIP'
@@ -34,14 +34,14 @@ makedepends=('mercurial' 'desktop-file-utils' 'gpm' 'gtk2' 'libxt' 'lua'
              'python' 'python2' 'ruby')
 
 pkgver() {
-  cd "${_gitname}"
+  cd "${srcdir}/${_hgname}"
 
   # Print the current revision.
   hg identify -ni | awk 'BEGIN{OFS=".";} {print $2}'
 }
 
 prepare() {
-  cd "${srcdir}/${_gitname}/src"
+  cd "${srcdir}/${_hgname}/src"
 
   # Run autotools.
   autoconf
@@ -53,12 +53,12 @@ prepare() {
          feature.h
 
   # Prepare the gvim build directory.
-  rm -rf "${srcdir}/g${_gitname}"
-  cp -r "${srcdir}/${_gitname}" "${srcdir}/g${_gitname}"
+  rm -rf "${srcdir}/g${_hgname}"
+  cp -r "${srcdir}/${_hgname}" "${srcdir}/g${_hgname}"
 }
 
 build() {
-  cd "${srcdir}/${_gitname}"
+  cd "${srcdir}/${_hgname}"
 
   # Configure and build a huge build (with plenty of languages).
   ./configure \
@@ -81,7 +81,7 @@ build() {
     --disable-gui
   make
 
-  cd "${srcdir}/g${_gitname}"
+  cd "${srcdir}/g${_hgname}"
 
   # Configure and build a huge build (with plenty of languages, and a GUI).
   ./configure \
@@ -106,7 +106,7 @@ build() {
 }
 
 check() {
-  cd "${srcdir}/${_gitname}"
+  cd "${srcdir}/${_hgname}"
 
   # Run the test suite (only test vim).
   make test
@@ -125,7 +125,7 @@ package_vim-hg() {
   conflicts=('gvim')
   provides=('vim')
 
-  cd "${srcdir}/${_gitname}"
+  cd "${srcdir}/${_hgname}"
 
   # Install the files.
   make VIMRCLOC=/etc DESTDIR="${pkgdir}" install
@@ -163,7 +163,7 @@ package_gvim-hg() {
   provides=('gvim' 'vim')
   install=gvim.install
 
-  cd "${srcdir}/g${_gitname}"
+  cd "${srcdir}/g${_hgname}"
 
   # Install the files.
   make VIMRCLOC=/etc DESTDIR="${pkgdir}" install
@@ -199,7 +199,7 @@ package_vim-runtime-hg() {
   provides=("vim-runtime=${pkgver}-${pkgrel}")
   conflicts=('vim-runtime')
 
-  cd "${srcdir}/${_gitname}/runtime"
+  cd "${srcdir}/${_hgname}/runtime"
 
   # Install runtime files.
   install -dm755 "${pkgdir}/usr/share/vim"

@@ -1,0 +1,26 @@
+# Maintainer: Neer Sighted <neersighted@myopera.com>
+# Contributor: Jaroslav Lichtblau <dragonlord@aur.archlinux.org>
+
+pkgname=cream
+pkgver=0.43
+pkgrel=1
+pkgdesc="A modern, easy-to-use configuration of the Vim text editor"
+url="http://cream.sourceforge.net/"
+license=('GPL')
+install=cream.install
+source=("http://downloads.sourceforge.net/sourceforge/cream/cream-${pkgver}.tar.gz")
+md5sums=('94bcd05000de3260fb15b00e13b0a7ea')
+sha1sums=('d0bc331184b059c2e5f9d50cab0760f4fe951f23')
+sha256sums=('b7adee33d5464f985a71722fdbe133e726bffebf34eae14c33674c4c5327d777')
+arch=('any')
+depends=('desktop-file-utils' 'gvim')
+conflicts=('cream')
+provides=('cream')
+
+package() {
+  cd "${srcdir}/cream-${pkgver}"
+
+  DESTDIR="${pkgdir}" sh INSTALL.sh
+}
+
+# vim:set ts=2 sw=2 et:

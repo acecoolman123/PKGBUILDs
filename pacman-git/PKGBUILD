@@ -22,7 +22,7 @@ conflicts=('pacman' 'pacman-contrib')
 provides=("pacman" 'pacman-contrib')
 
 pkgver() {
-  cd "${_gitname}"
+  cd "${srcdir}/${_gitname}"
 
   git describe --always | sed 's/^v//;s/-/./g'
 }
