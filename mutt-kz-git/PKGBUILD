@@ -9,7 +9,7 @@ url="https://github.com/karelzak/mutt-kz"
 license=('GPL')
 _gitname=mutt-kz
 source=("${_gitname}::git://github.com/karelzak/mutt-kz.git"
-'trash.patch::https://www.cs.oberlin.edu/~kuperman/help/code/patch-1.5.20.bk.trash_folder-purge_message.1.txt')
+        'trash.patch::https://www.cs.oberlin.edu/~kuperman/help/code/patch-1.5.20.bk.trash_folder-purge_message.1.txt')
 md5sums=('SKIP'
          'c120d08b7ebc26c2ee32f694be258249')
 sha1sums=('SKIP'
