@@ -19,7 +19,7 @@ makedepends=('git' 'asciidoc')
 optdepends=('fakeroot: for makepkg usage as normal user')
 checkdepends=('python2')
 conflicts=('pacman' 'pacman-contrib')
-provides=("pacman=${pkgver}" 'pacman-contrib')
+provides=("pacman" 'pacman-contrib')
 
 pkgver() {
   cd "${_gitname}"

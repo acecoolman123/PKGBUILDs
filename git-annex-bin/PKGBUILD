@@ -30,8 +30,8 @@ arch=('i686' 'x86_64')
 depends=('coreutils' 'curl' 'findutils' 'git' 'glibc' 'gmp' 'gnupg' 'gsasl'
 'libffi' 'libxml2' 'libyaml' 'lsof' 'openssh' 'pcre' 'rsync' 'util-linux'
 'wget' 'xz' 'zlib')
-provides=(git-annex)
 conflicts=(git-annex)
+provides=(git-annex)
 
 prepare() {
   cd "${srcdir}/git-annex.linux"

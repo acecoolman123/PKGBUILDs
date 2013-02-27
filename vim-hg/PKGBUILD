@@ -10,7 +10,7 @@ pkgname=vim-hg
 true && pkgname=('vim-hg' 'gvim-hg' 'vim-runtime-hg')
 pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version) (split package)'
 pkgver=4183
-pkgrel=1
+pkgrel=2
 url="http://vim.org"
 license=('custom:vim')
 _gitname=vim
@@ -30,8 +30,8 @@ sha256sums=('SKIP'
             'c4fe5e30dfd5093353e42c2c514d4492bec64da17f9a2b4e306af6ee39320715'
             '97e94c3ca5825d6ab50096eb8449adf1b05c88ad13e60e6a99be8daacc797eac')
 arch=('i686' 'x86_64')
-makedepends=('desktop-file-utils' 'gpm' 'gtk2' 'libxt' 'lua' 'mercurial'
-             'python2' 'ruby')
+makedepends=('mercurial' 'desktop-file-utils' 'gpm' 'gtk2' 'libxt' 'lua'
+             'python' 'python2' 'ruby')
 
 pkgver() {
   cd "${_gitname}"
@@ -72,11 +72,11 @@ build() {
     --enable-gpm \
     --enable-cscope \
     --disable-netbeans \
-    --enable-luainterp \
-    --enable-perlinterp \
-    --disable-python3interp \
-    --enable-pythoninterp \
-    --enable-rubyinterp \
+    --enable-luainterp=dynamic \
+    --enable-perlinterp=dynamic \
+    --enable-pythoninterp=dynamic \
+    --enable-python3interp=dynamic \
+    --enable-rubyinterp=dynamic \
     --without-x \
     --disable-gui
   make
@@ -95,11 +95,11 @@ build() {
     --enable-gpm \
     --enable-cscope \
     --enable-netbeans \
-    --enable-luainterp \
-    --enable-perlinterp \
-    --disable-python3interp \
-    --enable-pythoninterp \
-    --enable-rubyinterp \
+    --enable-luainterp=dynamic \
+    --enable-perlinterp=dynamic \
+    --enable-pythoninterp=dynamic \
+    --enable-python3interp=dynamic \
+    --enable-rubyinterp=dynamic \
     --with-x \
     --enable-gui=gtk2
   make
@@ -115,7 +115,15 @@ check() {
 package_vim-hg() {
   pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version)'
   depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm')
+  optdepends=(
+    'lua: lua interpreter support'
+    'perl: perl interpreter support'
+    'python: python 3 interpreter support'
+    'python2: python 2 interpreter support'
+    'ruby: ruby interpreter support'
+  )
   conflicts=('gvim')
+  provides=('vim')
 
   cd "${srcdir}/${_gitname}"
 
@@ -143,10 +151,16 @@ package_vim-hg() {
 
 package_gvim-hg() {
   pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI) (development version)'
-  depends=("vim-runtime=${pkgver}-${pkgrel}" 'desktop-file-utils'
-  'gpm' 'gtk2' 'libxt' 'lua' 'mercurial' 'python2' 'ruby')
-  provides=("vim=${pkgver}-${pkgrel}")
+  depends=("vim-runtime=${pkgver}-${pkgrel}" 'desktop-file-utils' 'gpm' 'gtk2')
+  optdepends=(
+    'lua: lua interpreter support'
+    'perl: perl interpreter support'
+    'python: python 3 interpreter support'
+    'python2: python 2 interpreter support'
+    'ruby: ruby interpreter support'
+  )
   conflicts=('vim')
+  provides=('gvim' 'vim')
   install=gvim.install
 
   cd "${srcdir}/g${_gitname}"
@@ -183,7 +197,7 @@ package_vim-runtime-hg() {
   backup=('etc/vimrc')
   depends=('perl' 'gawk')
   provides=("vim-runtime=${pkgver}-${pkgrel}")
-  options=(!strip !upx)
+  conflicts=('vim-runtime')
 
   cd "${srcdir}/${_gitname}/runtime"
 
