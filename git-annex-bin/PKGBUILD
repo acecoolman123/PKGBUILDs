@@ -33,7 +33,7 @@ depends=('coreutils' 'curl' 'findutils' 'git' 'glibc' 'gmp' 'gnupg' 'gsasl'
 provides=(git-annex)
 conflicts=(git-annex)
 
-build() {
+prepare() {
   cd "${srcdir}/git-annex.linux"
 
   # Patch library versions.

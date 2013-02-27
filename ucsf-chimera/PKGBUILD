@@ -14,9 +14,6 @@ sha1sums=('2afab982d898ec99573293c56ae30265b8981760')
 md5sums=('f5c56fa6ad0272bfb7a6962c23883510')
 arch=('i686' 'x86_64')
 
-# Enable extended globbing.
-shopt -s extglob
-
 package() {
   cd "${srcdir}"
 
