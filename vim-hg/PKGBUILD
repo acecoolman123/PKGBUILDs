@@ -10,7 +10,7 @@ pkgname=vim-hg
 true && pkgname=('vim-hg' 'gvim-hg' 'vim-runtime-hg')
 pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version) (split package)'
 pkgver=4183
-pkgrel=4
+pkgrel=1
 url="http://vim.org"
 license=('custom:vim')
 _gitname=vim
@@ -114,7 +114,7 @@ check() {
 
 package_vim-hg() {
   pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version)'
-  depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'gpm')
+  depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm')
   conflicts=('gvim')
 
   cd "${srcdir}/${_gitname}"
@@ -143,7 +143,7 @@ package_vim-hg() {
 
 package_gvim-hg() {
   pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI) (development version)'
-  depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'desktop-file-utils'
+  depends=("vim-runtime=${pkgver}-${pkgrel}" 'desktop-file-utils'
   'gpm' 'gtk2' 'libxt' 'lua' 'mercurial' 'python2' 'ruby')
   provides=("vim=${pkgver}-${pkgrel}")
   conflicts=('vim')

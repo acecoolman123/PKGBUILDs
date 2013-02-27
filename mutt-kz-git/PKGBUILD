@@ -3,7 +3,7 @@
 
 pkgname=mutt-kz-git
 pkgver=7870815
-pkgrel=2
+pkgrel=1
 pkgdesc='Small but very powerful text-based mail client (experimental fork with notmuch support) (heavily patched) (development version)'
 url="https://github.com/karelzak/mutt-kz"
 license=('GPL')
