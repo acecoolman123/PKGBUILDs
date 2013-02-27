@@ -10,7 +10,6 @@ pkgname=zramswap
 pkgver=1
 pkgrel=1
 pkgdesc="Automatic initialization of ZRam swap devices"
-arch=('any')
 url="http://en.wikipedia.org/wiki/ZRam"
 license=('GPL')
 install="zramswap.install"
@@ -22,6 +21,7 @@ sha1sums=('6995d1121ddd9cef0f6c1929d4faaf67a3f43b0a'
           '93607613ccbf648c08716fb8f4c0bf14a1248f0f')
 md5sums=('e7e8b6462120052a91ad39fd42ef3cb1'
          '560b724aaaf50678ed1c902cd1517109')
+arch=('any')
 
 package() {
   install -Dm755 zramctrl "${pkgdir}/usr/lib/systemd/scripts/zramctrl"

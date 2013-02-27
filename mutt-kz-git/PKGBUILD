@@ -69,3 +69,5 @@ package() {
   # Provided by the mime-types package.
   rm -f "etc/mime.types"
 }
+
+# vim: set ts=2 sw=2 et:

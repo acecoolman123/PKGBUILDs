@@ -5,8 +5,8 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 # Ugly hack for AUR uploading.
+pkgbase=vim-hg
 pkgname=vim-hg
-true && pkgbase=vim-hg
 true && pkgname=('vim-hg' 'gvim-hg' 'vim-runtime-hg')
 pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version) (split package)'
 pkgver=4183
@@ -113,10 +113,9 @@ check() {
 }
 
 package_vim-hg() {
-  # AUR workaround.
-  true && pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version)'
-  true && depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'gpm')
-  true && conflicts=('gvim')
+  pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version)'
+  depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'gpm')
+  conflicts=('gvim')
 
   cd "${srcdir}/${_gitname}"
 
@@ -143,13 +142,12 @@ package_vim-hg() {
 }
 
 package_gvim-hg() {
-  # AUR workaround.
-  true && pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI) (development version)'
-  true && depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'desktop-file-utils'
+  pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI) (development version)'
+  depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'desktop-file-utils'
   'gpm' 'gtk2' 'libxt' 'lua' 'mercurial' 'python2' 'ruby')
-  true && provides=("vim=${pkgver}-${pkgrel}")
-  true && conflicts=('vim')
-  true && install=gvim.install
+  provides=("vim=${pkgver}-${pkgrel}")
+  conflicts=('vim')
+  install=gvim.install
 
   cd "${srcdir}/g${_gitname}"
 
@@ -181,12 +179,11 @@ package_gvim-hg() {
 }
 
 package_vim-runtime-hg() {
-  # AUR workaround.
-  true && pkgdesc='Runtime for vim and gvim (development version)'
-  true && backup=('etc/vimrc')
-  true && depends=('perl' 'gawk')
-  true && provides=("vim-runtime=${pkgver}-${pkgrel}")
-  true && options=(!strip !upx)
+  pkgdesc='Runtime for vim and gvim (development version)'
+  backup=('etc/vimrc')
+  depends=('perl' 'gawk')
+  provides=("vim-runtime=${pkgver}-${pkgrel}")
+  options=(!strip !upx)
 
   cd "${srcdir}/${_gitname}/runtime"
 
@@ -214,4 +211,5 @@ package_vim-runtime-hg() {
   sed -i 's|messages,/var|messages,/var/log/messages.log,/var|' \
     usr/share/vim/vim73/filetype.vim
 }
+
 # vim:set ts=2 sw=2 et:
