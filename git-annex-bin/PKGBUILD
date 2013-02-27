@@ -1,0 +1,64 @@
+# Maintainer: Neer SIghted (neersighted) <neersighted@myopera.com>
+# Contributor: Sairon Istyar <saironiq@gmail.com>
+
+pkgname=git-annex-bin
+pkgver=3.20130216
+pkgrel=1
+pkgdesc='Manage files with git, without checking their contents into git (precompiled version)'
+url="http://git-annex.branchable.com/"
+license=('GPL3')
+_file="git-annex-standalone-${pkgver}.tar.gz"
+case "$CARCH" in
+  (i686)
+    source=($_file::http://downloads.kitenet.net/git-annex/linux/$pkgver/git-annex-standalone-i386.tar.gz)
+    md5sums=('971485f67e04a874992ec29735e5258e')
+    sha1sums=('8df0c053bf52885cbe9d8ba6084bd4cdb68dc486')
+    sha256sums=('e1a97357132e97e909190c3c48e11e231b8a6e69695bfc85a35e2f010def6e8e')
+  ;;
+  (x86_64)
+    source=($_file::http://downloads.kitenet.net/git-annex/linux/$pkgver/git-annex-standalone-amd64.tar.gz)
+    md5sums=('faf0875824a455684edc35fc17f9f3c2')
+    sha1sums=('4f078bb0b95510e0ef4620817e0711811b1af3b7')
+    sha256sums=('4afa37bb447154ebd32e4b0a50e0732d4409baadce4c306f930fc06b081f8662')
+  ;;
+  (*)
+    echo "Unsupported architecture!"
+    exit 1
+  ;;
+esac
+arch=('i686' 'x86_64')
+depends=('coreutils' 'curl' 'findutils' 'git' 'glibc' 'gmp' 'gnupg' 'gsasl'
+'libffi' 'libxml2' 'libyaml' 'lsof' 'openssh' 'pcre' 'rsync' 'util-linux'
+'wget' 'xz' 'zlib')
+provides=(git-annex)
+conflicts=(git-annex)
+
+build() {
+  cd "${srcdir}/git-annex.linux"
+
+  # Patch library versions.
+  if grep -o 'libpcre.so.3' bin/git-annex; then
+    sed -i 's/libpcre\.so\.3/libpcre\.so\.1/g' \
+           bin/git-annex
+  fi
+
+  if grep -o 'libffi.so.5' bin/git-annex; then
+    sed -i 's/libffi\.so\.5/libffi\.so\.6/g' \
+           bin/git-annex
+  fi
+
+  if grep -o 'libgnutls.so.26' bin/git-annex; then
+    sed -i 's/libgnutls\.so\.26/libgnutls\.so\.28/g' \
+           bin/git-annex
+  fi
+}
+
+package() {
+  cd "${srcdir}/git-annex.linux"
+
+  # Install the files.
+  install -Dm755 bin/git-annex "${pkgdir}/usr/bin/git-annex"
+  ln -s git-annex "${pkgdir}/usr/bin/git-annex-shell"
+}
+
+# vim:set ts=2 sw=2 et:

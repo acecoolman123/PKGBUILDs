@@ -48,9 +48,9 @@ prepare() {
 
   # Fix the location of /etc/vimrc.
   sed -i 's/^.*\(#define SYS_.*VIMRC_FILE.*"\) .*$/\1/' \
-        feature.h
+         feature.h
   sed -i 's/^.*\(#define VIMRC_FILE.*"\) .*$/\1/' \
-        feature.h
+         feature.h
 
   # Prepare the gvim build directory.
   rm -rf "${srcdir}/g${_gitname}"
