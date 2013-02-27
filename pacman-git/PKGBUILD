@@ -1,0 +1,108 @@
+# Maintainer: Neer Sighted (neersighted) <neersighted@myopera.com>
+# Contributor: Dave Reisner <d@falconindy.com>
+
+pkgname=pacman-git
+pkgver=4.0.3.589.g8e2648b
+pkgrel=1
+pkgdesc="A library-based package manager with dependency support (development version)"
+arch=('i686' 'x86_64')
+url="http://www.archlinux.org/pacman/"
+license=('GPL')
+_gitname=pacman
+source=("${_gitname}::git://projects.archlinux.org/pacman.git")
+md5sums=('SKIP')
+sha1sums=('SKIP')
+sha256sums=('SKIP')
+backup=('etc/makepkg.conf' 'etc/pacman.conf')
+depends=('bash' 'curl' 'gpgme' 'libarchive' 'pacman-mirrorlist')
+makedepends=('git' 'asciidoc')
+optdepends=('fakeroot: for makepkg usage as normal user')
+checkdepends=('python2')
+conflicts=('pacman' 'pacman-contrib')
+provides=("pacman=${pkgver}" 'pacman-contrib')
+options=('!libtool' '!strip')
+
+pkgver() {
+  cd "${_gitname}"
+
+  git describe --always | sed 's/^v//;s/-/./g'
+}
+
+prepare() {
+  cd "${srcdir}/${_gitname}"
+
+  # Run autotools.
+  ./autogen.sh
+}
+
+build() {
+  cd "${srcdir}/${_gitname}"
+
+  # Configure the build.
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --enable-doc \
+    --enable-git-version \
+    --enable-debug \
+    --with-scriptlet-shell=/usr/bin/bash \
+    --with-ldconfig=/usr/bin/ldconfig
+
+  # Build it!
+  make
+  make -C contrib
+}
+
+check() {
+  cd "${srcdir}/${_gitname}"
+
+  # Check the build.
+  make check
+}
+
+package() {
+  cd "${srcdir}/${_gitname}"
+
+  # Install the files.
+  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" -C contrib install
+
+  # Install Vim runtime files.
+  install -dm755 "${pkgdir}/usr/share/vim/vimfiles/ftdetect"
+  echo "au BufNewFile,BufRead PKGBUILD set filetype=PKGBUILD" > \
+       "${pkgdir}/usr/share/vim/vimfiles/ftdetect/PKGBUILD.vim"
+  install -Dm644 "contrib/PKGBUILD.vim" \
+                 "${pkgdir}/usr/share/vim/vimfiles/syntax/PKGBUILD.vim"
+
+  # Install shell completion files.
+  install -Dm644 contrib/bash_completion "${pkgdir}/usr/share/bash-completion/completions/pacman"
+  for f in makepkg pacman-key; do
+    ln -s pacman "${pkgdir}/usr/share/bash-completion/completions/${f}"
+  done
+  install -Dm644 contrib/zsh_completion "${pkgdir}/usr/share/zsh/site-functions/_pacman"
+
+  cd "${pkgdir}"
+
+  # Clear unused completions.
+  rm -r "${pkgdir}/etc/bash_completion.d"
+
+  # Set the correct CHOST/CARCH/CFLAGS.
+  case $CARCH in
+    i686)
+      chost="i686-pc-linux-gnu"
+      cflags="-march=i686 "
+      ;;
+    x86_64)
+      chost="x86_64-unknown-linux-gnu"
+      cflags="-march=x86-64 "
+      ;;
+  esac
+
+  sed -i "etc/makepkg.conf" \
+    -e "s|@CARCH[@]|$CARCH|g" \
+    -e "s|@CHOST[@]|$chost|g" \
+    -e "s|@CARCHFLAGS[@]|$cflags|g"
+}
+
+# vim: set ts=2 sw=2 et:

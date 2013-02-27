@@ -1,0 +1,39 @@
+# Maintainer: Neer Sighted (neersighted) <neersighted@myopera.com>
+# Contributor: Dave Reisner <d@falconindy.com>
+
+pkgname=burp-git
+pkgver=2.1.ga245105
+pkgrel=1
+pkgdesc="A simple AUR uploader"
+url="http://github.com/falconindy/burp"
+license=('MIT')
+_gitname=burp
+source=("${_gitname}::git://github.com/falconindy/burp.git")
+md5sums=('SKIP')
+sha1sums=('SKIP')
+sha256sums=('SKIP')
+arch=('i686' 'x86_64')
+depends=('curl')
+makedepends=('git' 'perl')
+conflicts=('burp')
+provides=('burp')
+
+pkgver() {
+  cd "${_gitname}"
+
+  git describe --always | sed 's/-/./g'
+}
+
+build() {
+  cd "${srcdir}/${_gitname}"
+
+  # Build it!
+  make
+}
+
+package() {
+  cd "${srcdir}/${_gitname}"
+
+  # Install the files.
+  make DESTDIR="$pkgdir" PREFIX=/usr install
+}

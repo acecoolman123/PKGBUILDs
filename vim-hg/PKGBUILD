@@ -1,0 +1,217 @@
+# Maintainer: Neer Sighted (neersighted) <neersighted@myopera.com>
+# Contributor: Thomas Dziedzic <gostrc@gmail.com>
+# Contributor: Jan "heftig" Steffens <jan.steffens@gmail.com>
+# Contributor: tobias [ tobias at archlinux org ]
+# Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
+
+# Ugly hack for AUR uploading.
+pkgname=vim-hg
+true && pkgbase=vim-hg
+true && pkgname=('vim-hg' 'gvim-hg' 'vim-runtime-hg')
+pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version) (split package)'
+pkgver=4183
+pkgrel=4
+url="http://vim.org"
+license=('custom:vim')
+_gitname=vim
+source=("${_gitname}::hg+https://vim.googlecode.com/hg" 'vimrc' 'archlinux.vim'
+        'gvim.desktop')
+license=('custom:vim')
+md5sums=('SKIP'
+         '50886ef12beb6ee1c003bdbe05b9fef1'
+         '10353a61aadc3f276692d0e17db1478e'
+         'd90413bd21f400313a785bb4010120cd')
+sha1sums=('SKIP'
+          '7db03d696915f1e1f46b719ceb02488f4460a7f4'
+          '25dd3c2ce436e73a367c8f73b68f7f6889682437'
+          '4a579cf66590d711f49c5dfb4a25e5df116ff7ba')
+sha256sums=('SKIP'
+            'd60eeb11028d041be34133630369926026b26d4a60ff5dfe795affe330bca611'
+            'c4fe5e30dfd5093353e42c2c514d4492bec64da17f9a2b4e306af6ee39320715'
+            '97e94c3ca5825d6ab50096eb8449adf1b05c88ad13e60e6a99be8daacc797eac')
+arch=('i686' 'x86_64')
+makedepends=('desktop-file-utils' 'gpm' 'gtk2' 'libxt' 'lua' 'mercurial'
+             'python2' 'ruby')
+
+pkgver() {
+  cd "${_gitname}"
+
+  # Print the current revision.
+  hg identify -ni | awk 'BEGIN{OFS=".";} {print $2}'
+}
+
+prepare() {
+  cd "${srcdir}/${_gitname}/src"
+
+  # Run autotools.
+  autoconf
+
+  # Fix the location of /etc/vimrc.
+  sed -i 's/^.*\(#define SYS_.*VIMRC_FILE.*"\) .*$/\1/' \
+        feature.h
+  sed -i 's/^.*\(#define VIMRC_FILE.*"\) .*$/\1/' \
+        feature.h
+
+  # Prepare the gvim build directory.
+  rm -rf "${srcdir}/g${_gitname}"
+  cp -r "${srcdir}/${_gitname}" "${srcdir}/g${_gitname}"
+}
+
+build() {
+  cd "${srcdir}/${_gitname}"
+
+  # Configure and build a huge build (with plenty of languages).
+  ./configure \
+    --with-compiledby=ArchLinux \
+    --prefix=/usr \
+    --localstatedir=/var/lib/vim \
+    --mandir=/usr/share/man \
+    --with-features=huge \
+    --enable-multibyte \
+    --enable-acl \
+    --enable-gpm \
+    --enable-cscope \
+    --disable-netbeans \
+    --enable-luainterp \
+    --enable-perlinterp \
+    --disable-python3interp \
+    --enable-pythoninterp \
+    --enable-rubyinterp \
+    --without-x \
+    --disable-gui
+  make
+
+  cd "${srcdir}/g${_gitname}"
+
+  # Configure and build a huge build (with plenty of languages, and a GUI).
+  ./configure \
+    --with-compiledby=ArchLinux \
+    --prefix=/usr \
+    --localstatedir=/var/lib/vim \
+    --mandir=/usr/share/man \
+    --with-features=huge \
+    --enable-multibyte \
+    --enable-acl \
+    --enable-gpm \
+    --enable-cscope \
+    --enable-netbeans \
+    --enable-luainterp \
+    --enable-perlinterp \
+    --disable-python3interp \
+    --enable-pythoninterp \
+    --enable-rubyinterp \
+    --with-x \
+    --enable-gui=gtk2
+  make
+}
+
+check() {
+  cd "${srcdir}/${_gitname}"
+
+  # Run the test suite (only test vim).
+  make test
+}
+
+package_vim-hg() {
+  # AUR workaround.
+  true && pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (development version)'
+  true && depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'gpm')
+  true && conflicts=('gvim')
+
+  cd "${srcdir}/${_gitname}"
+
+  # Install the files.
+  make VIMRCLOC=/etc DESTDIR="${pkgdir}" install
+
+  # ex(1) and view(1) are provided by (n)vi in core, and evim needs a gui.
+  rm "${pkgdir}/usr/bin/ex" "${pkgdir}/usr/bin/view"
+  find "${pkgdir}/usr/share/man" -type d -name 'man1' 2>/dev/null | \
+  while read _mandir; do
+    cd ${_mandir}
+
+    rm ex.1 view.1
+    rm evim.1
+  done
+
+  # Runtime files are part of vim-runtime.
+  rm -rf "${pkgdir}/usr/share/vim"
+
+
+  # Install the license.
+  install -Dm755 runtime/doc/uganda.txt \
+                 "${pkgdir}/usr/share/licenses/vim/LICENSE"
+}
+
+package_gvim-hg() {
+  # AUR workaround.
+  true && pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI) (development version)'
+  true && depends=("vim-runtime-hg=${pkgver}-${pkgrel}" 'desktop-file-utils'
+  'gpm' 'gtk2' 'libxt' 'lua' 'mercurial' 'python2' 'ruby')
+  true && provides=("vim=${pkgver}-${pkgrel}")
+  true && conflicts=('vim')
+  true && install=gvim.install
+
+  cd "${srcdir}/g${_gitname}"
+
+  # Install the files.
+  make VIMRCLOC=/etc DESTDIR="${pkgdir}" install
+
+  # ex(1) and view(1) are provided by (n)vi in core.
+  rm "${pkgdir}/usr/bin/ex" "${pkgdir}/usr/bin/view"
+  find "${pkgdir}/usr/share/man" -type d -name 'man1' 2>/dev/null | \
+  while read _mandir; do
+    cd ${_mandir}
+
+    rm ex.1 view.1
+  done
+
+  # Runtime files are part of vim-runtime.
+  rm -rf "${pkgdir}/usr/share/vim"
+
+
+  # Install FreeDesktop files.
+  install -Dm644 "${srcdir}/gvim.desktop" \
+                "${pkgdir}/usr/share/applications/gvim.desktop"
+  install -Dm644 runtime/vim48x48.png \
+                "${pkgdir}/usr/share/pixmaps/gvim.png"
+
+  # Install the license.
+  install -Dm755 runtime/doc/uganda.txt \
+                 "${pkgdir}/usr/share/licenses/gvim/LICENSE"
+}
+
+package_vim-runtime-hg() {
+  # AUR workaround.
+  true && pkgdesc='Runtime for vim and gvim (development version)'
+  true && backup=('etc/vimrc')
+  true && depends=('perl' 'gawk')
+  true && provides=("vim-runtime=${pkgver}-${pkgrel}")
+  true && options=(!strip !upx)
+
+  cd "${srcdir}/${_gitname}/runtime"
+
+  # Install runtime files.
+  install -dm755 "${pkgdir}/usr/share/vim"
+  cp -r . "${pkgdir}/usr/share/vim/vim73"
+  install -Dm644 "${srcdir}/vimrc" \
+                 "${pkgdir}/etc/vimrc"
+  install -Dm644 "${srcdir}/archlinux.vim"  \
+                 "${pkgdir}/usr/share/vim/vimfiles/archlinux.vim"
+
+  # Install the license.
+  install -Dm755 doc/uganda.txt \
+                 "${pkgdir}/usr/share/licenses/vim-runtime/LICENSE"
+
+  cd "${pkgdir}"
+
+  # Patch changelog.vim to parse Pacman changelogs better.
+  sed -i "/find the end/,+3{s/changelog_date_entry_search/changelog_date_end_entry_search/}" \
+    usr/share/vim/vim73/ftplugin/changelog.vim
+  # Patch filetype.vim for better handling of pacman related files.
+  sed -i "s/rpmsave/pacsave/;s/rpmnew/pacnew/;s/,\*\.ebuild/\0,PKGBUILD*,*.install/" \
+    usr/share/vim/vim73/filetype.vim
+  # Patch filetype.vim to use the correct messages location.
+  sed -i 's|messages,/var|messages,/var/log/messages.log,/var|' \
+    usr/share/vim/vim73/filetype.vim
+}
+# vim:set ts=2 sw=2 et:

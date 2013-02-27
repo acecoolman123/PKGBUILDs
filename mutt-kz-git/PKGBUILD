@@ -1,0 +1,71 @@
+# Maintainer: Neer Sighted (neersighted) <neersighted@myopera.com>
+# Contributor: boyska <piuttosto@logorroici.org>
+
+pkgname=mutt-kz-git
+pkgver=7870815
+pkgrel=2
+pkgdesc='Small but very powerful text-based mail client (experimental fork with notmuch support) (heavily patched) (development version)'
+url="https://github.com/karelzak/mutt-kz"
+license=('GPL')
+_gitname=mutt-kz
+source=("${_gitname}::git://github.com/karelzak/mutt-kz.git"
+'trash.patch.bz2::http://dbg.download.sourcemage.org/grimoire/codex/stable/mail/mutt/patches/trash_folder/trash_folder-1.5.18.patch.bz2')
+md5sums=('SKIP'
+         '9d95c08295f8ec5171f774f776ef8413')
+sha1sums=('SKIP'
+          '33037a91443aa4b0a510b4250dd4bead3a697aee')
+sha256sums=('SKIP'
+            'abd0eb64e5604dc8fcb9d7550ff10c23d2a098d1386c5e91caa03c9d1023c2ba')
+arch=('i686' 'x86_64')
+depends=('gdbm' 'gpgme' 'openssl>=0.9.8e' 'libsasl' 'mime-types' 'ncurses' 'notmuch' 'zlib')
+makedepends=('git' 'gnupg' 'libxslt')
+conflicts=('mutt')
+provides=('mutt')
+
+pkgver() {
+  cd "${_gitname}"
+
+  git describe --always | sed 's/-/./g'
+}
+
+prepare() {
+  cd "${srcdir}/${_gitname}"
+
+  # Apply patches.
+  patch -p1 < "${srcdir}/trash.patch"
+}
+
+build() {
+  cd "${srcdir}/${_gitname}"
+
+  # Configure the build.
+ ./prepare \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --enable-debug \
+    --enable-gpgme \
+    --enable-hcache \
+    --enable-imap \
+    --enable-notmuch \
+    --enable-pgp \
+    --enable-pop \
+    --enable-smtp \
+    --with-idn \
+    --with-sasl \
+    --with-ssl=/usr
+
+  # Build it!
+  make
+}
+
+package() {
+  cd "${srcdir}/${_gitname}"
+
+  # Install the files.
+  make DESTDIR="${pkgdir}" install
+
+  cd "${pkgdir}"
+
+  # Provided by the mime-types package.
+  rm -f "etc/mime.types"
+}
