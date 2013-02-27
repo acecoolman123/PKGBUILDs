@@ -1,0 +1,40 @@
+# Maintainer: Neer Sighted (neersighted) <neersighted@myopera.com>
+
+pkgname=pyalpm-pacman41-git
+pkgver=0.5.2.5.g2fbd5a3
+pkgrel=1
+pkgdesc="Python 3 bindings for libalpm (with changes for Pacman 4.1) (development version)"
+url="https://projects.archlinux.org/users/remy/pyalpm.git/?h=pacman-4.1"
+license=('GPL3')
+_gitname=pyalpm-pacman41
+source=("${_gitname}::git://projects.archlinux.org/users/remy/pyalpm.git#branch=pacman-4.1")
+md5sums=('SKIP')
+sha1sums=('SKIP')
+sha256sums=('SKIP')
+arch=('i686' 'x86_64')
+depends=('python')
+makedepends=('git')
+conflicts=('pyalpm')
+provides=('pyalpm')
+
+pkgver() {
+  cd "${srcdir}/${_gitname}"
+
+  git describe --always | sed 's/^v//;s/-/./g'
+}
+
+build() {
+  cd "${srcdir}/${_gitname}"
+
+  # Build it!
+  python setup.py build
+}
+
+package() {
+  cd "${srcdir}/${_gitname}"
+
+  # Install the files.
+  python setup.py install --root="${pkgdir}" --prefix=/usr
+}
+
+# vim: set ts=2 sw=2 et:
